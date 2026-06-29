@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuantAI 뉴스 분석 - 투자자 전용 핵심 큐레이션</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Marked.js for Markdown Rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+  <!-- Background Glow Accents -->
+  <div class="glow-bg">
+    <div class="glow-sphere glow-1"></div>
+    <div class="glow-sphere glow-2"></div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-logo">⚡</span>
+        <div class="brand-text">
+          <h1>QuantAI</h1>
+          <p>AI-Powered Financial News Analytics</p>
+        </div>
+      </div>
+      
+      <div class="header-actions">
+        <!-- API Status / Set Button -->
+        <button id="btn-settings" class="btn btn-secondary flex-center" title="API 설정">
+          <span class="icon-gear">⚙️</span>
+          <span>API 설정</span>
+        </button>
+        <!-- Refresh Button -->
+        <button id="btn-refresh-news" class="btn btn-primary flex-center">
+          <span class="icon-refresh">🔄</span>
+          <span>새로고침</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- API Settings Modal/Overlay -->
+    <div id="settings-modal" class="modal-overlay hidden">
+      <div class="modal-card glass">
+        <div class="modal-header">
+          <h3>Gemini API Key 설정</h3>
+          <button id="btn-close-settings" class="btn-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">
+            이 서비스는 Google Gemini API와 Search Grounding을 활용합니다.<br>
+            로컬 `.env` 파일에 키를 설정하지 않았다면 아래에 직접 입력할 수 있습니다.
+          </p>
+          <div class="form-group">
+            <label for="input-api-key">GEMINI API KEY</label>
+            <input type="password" id="input-api-key" placeholder="AIzaSy..." class="form-input">
+          </div>
+          <p class="api-help">키는 브라우저 로컬 스토리지에만 안전하게 임시 저장됩니다.</p>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-save-key" class="btn btn-primary w-full">저장하기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Warning Bar -->
+    <div id="api-warning-bar" class="warning-bar hidden">
+      <span>⚠️ <strong>Gemini API Key가 설정되지 않았습니다.</strong> 정상 작동을 위해 우측 상단 ⚙️ 설정을 클릭해 키를 등록해 주세요.</span>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="app-nav">
+      <button class="nav-tab active" data-tab="tab-news">
+        <span class="tab-icon">🌅</span> 오늘의 핵심 뉴스
+      </button>
+      <button class="nav-tab" data-tab="tab-analysis" id="tab-btn-analysis">
+        <span class="tab-icon">🔍</span> 실시간 심층 분석
+      </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      
+      <!-- Tab 1: 오늘의 핵심 뉴스 -->
+      <section id="tab-news" class="tab-content active">
+        <div class="section-header">
+          <h2 id="news-date-title">🌅 오늘의 핵심 뉴스</h2>
+          <span class="badge badge-info" id="news-update-time">시각 동기화 중...</span>
+        </div>
+
+        <!-- News Cards Container -->
+        <div id="news-list" class="news-grid">
+          <!-- Loading state -->
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Google Search Grounding을 통해<br>지난 24시간 이내의 핵심 경제 뉴스를 엄선하여 요약 중입니다...</p>
+            <span class="loading-sub">최대 20초 정도 소요될 수 있습니다.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 2: 실시간 심층 분석 -->
+      <section id="tab-analysis" class="tab-content">
+        <div class="analysis-layout">
+          <!-- Selected News Context (Left Column) -->
+          <div class="analysis-sidebar">
+            <div class="sidebar-sticky">
+              <h3>분석 대상 뉴스</h3>
+              <div id="selected-news-card" class="news-card-mini glass">
+                <p class="empty-selection-msg">오늘의 핵심 뉴스 탭에서 기사를 선택해 <strong>[심층 분석하기]</strong>를 눌러 주세요.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analysis Report View (Right Column) -->
+          <div class="analysis-main glass">
+            <div id="analysis-loading" class="analysis-loading-state hidden">
+              <div class="pulse-ring"></div>
+              <p>기사 본문 전체를 스크래핑하여<br>AI가 심층 분석 보고서를 작성하는 중입니다...</p>
+              <span class="loading-sub">표면적인 헤드라인을 넘어 파급 효과와 중장기 함의를 읽어내고 있습니다.</span>
+            </div>
+
+            <div id="analysis-placeholder" class="analysis-placeholder-state">
+              <span class="placeholder-icon">📋</span>
+              <p>왼쪽에서 뉴스를 선택하거나 요약 탭에서 <strong>심층 분석하기</strong> 버튼을 누르면 친근한 어조의 정독 보고서가 생성됩니다.</p>
+            </div>
+
+            <div id="analysis-report" class="report-content markdown-body hidden">
+              <!-- Rendered markdown analysis output -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>&copy; 2026 QuantAI. 모든 권한은 투자자 본인의 판단과 책임 하에 있습니다. AI 분석은 참고용입니다.</p>
+    </footer>
+  </div>
+
+  <!-- Javascript File -->
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aurora Strategy Lab - AI 주식 자동매매 & 백테스팅</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="/static/index.css">
+  <!-- Chart.js for premium interactive backtesting charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="dashboard-wrapper">
+    <!-- TOP NAVIGATION BAR -->
+    <header class="top-nav" id="top-navigation-bar">
+      <div class="logo-area">
+        <span class="logo-icon">▲</span>
+        <h1 class="logo-text">Aurora Strategy Lab</h1>
+      </div>
+      <nav class="nav-tabs">
+        <button class="tab-btn active" data-tab="dashboard">대시보드</button>
+        <button class="tab-btn" data-tab="scanner">실시간 스캔</button>
+        <button class="tab-btn" data-tab="backtest">백테스트</button>
+        <button class="tab-btn" data-tab="paper">모의투자</button>
+        <button class="tab-btn" data-tab="real">실전매매</button>
+      </nav>
+      <div class="system-status">
+        <span class="status-indicator red" id="ws-indicator"></span>
+        <span class="status-text" id="ws-status-text">Disconnected</span>
+      </div>
+    </header>
+
+    <!-- MAIN GRID CONTAINER -->
+    <main class="dashboard-grid">
+      <!-- LEFT SIDEBAR: SCAN & STRATEGY SELECTION -->
+      <section class="panel left-panel" id="strategy-selector">
+        <div class="panel-header">
+          <h2>스캔 및 전략 설정</h2>
+        </div>
+        <div class="panel-body">
+          <!-- Target configuration -->
+          <div class="form-group">
+            <label for="scan-target">스캔 대상 시장</label>
+            <select id="scan-target" class="form-control">
+              <option value="KRX">KRX (코스피/코스닥)</option>
+              <option value="NASDAQ">NASDAQ (미국 나스닥)</option>
+              <option value="SP500">S&P 500</option>
+            </select>
+          </div>
+
+          <!-- Strategy preset selector -->
+          <div class="strategy-presets">
+            <h3>프리셋 조건검색 전략</h3>
+            <div class="checkbox-group">
+              <label class="checkbox-container">
+                <input type="checkbox" id="strat-rocket" checked>
+                <span class="checkmark"></span>
+                <span class="checkbox-label">로켓풍 Plus</span>
+                <span class="strategy-desc">정배열 + 전고점 돌파 + 거래량 급증</span>
+              </label>
+              <label class="checkbox-container">
+                <input type="checkbox" id="strat-domino">
+                <span class="checkmark"></span>
+                <span class="checkbox-label">도미노 로켓풍</span>
+                <span class="strategy-desc">이동평균선 정배열 + 거래량 급증</span>
+              </label>
+              <label class="checkbox-container">
+                <input type="checkbox" id="strat-swing">
+                <span class="checkmark"></span>
+                <span class="checkbox-label">스윙 추세돌파</span>
+                <span class="strategy-desc">MA5/MA20 정배열 + 당일 전고 돌파</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Stock lists summary -->
+          <div class="ticker-list-summary">
+            <h3>분석 종목 리스트</h3>
+            <div class="ticker-badges" id="ticker-badges-container">
+              <!-- Dynamically populated badges -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CENTER CONTENT: REAL-TIME SIGNAL DISPLAY & RUNTIME LOGS -->
+      <section class="center-content">
+        <!-- TOP CENTER: SIGNAL TABLE -->
+        <div class="panel signal-panel" id="signal-display">
+          <div class="panel-header flex-header">
+            <h2>실시간 신호 및 매매 알림</h2>
+            <div class="panel-actions">
+              <button class="btn btn-primary" id="btn-toggle-scan">스캐너 시작</button>
+            </div>
+          </div>
+          <div class="panel-body table-container">
+            <table class="data-table" id="signal-table">
+              <thead>
+                <tr>
+                  <th>시간</th>
+                  <th>전략명</th>
+                  <th>종목코드</th>
+                  <th>종목명</th>
+                  <th>현재가</th>
+                  <th>구분</th>
+                </tr>
+              </thead>
+              <tbody id="signal-tbody">
+                <tr class="placeholder-row">
+                  <td colspan="6">실시간 신호 대기 중... 스캐너를 시작해 주세요.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- BOTTOM CENTER: EXECUTION LOGS -->
+        <div class="panel log-panel" id="log-viewer">
+          <div class="panel-header flex-header">
+            <h2>시스템 실행 로그</h2>
+            <button class="btn btn-secondary btn-sm" id="btn-clear-logs">Clear</button>
+          </div>
+          <div class="panel-body console-body" id="log-console">
+            <!-- Dynamically populated logs -->
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT SIDEBAR: FILTERS & BACKTEST & AI TRANSLATOR -->
+      <section class="panel right-panel" id="control-panel">
+        <div class="panel-header">
+          <h2>백테스트 필터 및 AI 도구</h2>
+        </div>
+        <div class="panel-body scroll-y">
+          <!-- Filters section -->
+          <div class="filter-section">
+            <h3>백테스트 범위 필터</h3>
+            <div class="form-row">
+              <div class="form-group col-6">
+                <label for="history-days">수집 일수 (영업일)</label>
+                <input type="number" id="history-days" class="form-control" value="365" min="30" max="730">
+              </div>
+              <div class="form-group col-6">
+                <label for="min-price">최소 가격 (원)</label>
+                <input type="number" id="min-price" class="form-control" value="1000" min="0">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-12">
+                <label for="min-volume">최소 평균 거래량</label>
+                <input type="number" id="min-volume" class="form-control" value="10000" min="0">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="checkbox-container">
+                <input type="checkbox" id="include-etf" checked>
+                <span class="checkmark"></span>
+                <span class="checkbox-label">레버리지 / 인버스 ETF 포함</span>
+              </label>
+            </div>
+            <button class="btn btn-success w-full" id="btn-run-backtest">백테스트 실행</button>
+          </div>
+
+          <!-- AI Strategy Generator Section -->
+          <div class="ai-generator-section">
+            <h3>AI 자연어 수식 변환기</h3>
+            <div class="form-group">
+              <label for="ai-nl-input">조건 아이디어 입력</label>
+              <input type="text" id="ai-nl-input" class="form-control" placeholder="예: 5일 이동평균선이 20일선 골든크로스">
+            </div>
+            <button class="btn btn-purple w-full" id="btn-translate-nlp">수식 변환</button>
+
+            <div class="form-group mt-3">
+              <label for="ai-code-output">변환된 Pandas 수식</label>
+              <textarea id="ai-code-output" class="form-control code-textarea" rows="3" readonly></textarea>
+            </div>
+          </div>
+
+          <!-- Backtest results summary (Hidden initially) -->
+          <div class="backtest-results-panel" id="backtest-results" style="display: none;">
+            <h3>시뮬레이션 요약 결과</h3>
+            <div class="metrics-grid">
+              <div class="metric-card">
+                <span class="metric-label">누적 수익률</span>
+                <span class="metric-value" id="res-return">0%</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">승률 (Win Rate)</span>
+                <span class="metric-value" id="res-winrate">0%</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">최대 낙폭 (MDD)</span>
+                <span class="metric-value" id="res-mdd">0%</span>
+              </div>
+              <div class="metric-card">
+                <span class="metric-label">총 거래 횟수</span>
+                <span class="metric-value" id="res-trades">0회</span>
+              </div>
+            </div>
+            
+            <div class="chart-container-wrapper">
+              <canvas id="returnChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- JavaScript logic -->
+  <script src="/static/app.js"></script>
+</body>
+</html>

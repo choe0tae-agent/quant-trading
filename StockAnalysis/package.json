@@ -1,0 +1,13 @@
+{
+  "name": "aurora-strategy-translator",
+  "version": "1.0.0",
+  "description": "Natural language query translator for stock trading conditions",
+  "main": "translator.js",
+  "scripts": {
+    "start": "node translator.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}

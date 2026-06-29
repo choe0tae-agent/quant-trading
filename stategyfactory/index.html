@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Trading Bots | StrategyFactory.ai by DaviddTech</title>
+  <meta name="description" content="Use AI trading bots built around tested strategy logic, backtesting data, TradingView automation, and live execution workflows.">
+  <link rel="stylesheet" href="./style.css">
+  <!-- Chart.js CDN for performance charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- Top Banner -->
+  <div class="banner">
+    <i data-lucide="zap" style="width: 1.1rem; height: 1.1rem; fill: currentColor;"></i>
+    <span>FREE BOT ACCESS: START STRATEGYFACTORY TODAY</span>
+    <a href="#pricing-view" id="banner-cta" class="nb-badge nb-badge-orange" style="margin-left: 0.75rem; text-decoration: none; font-size: 0.7rem; box-shadow: 2px 2px 0px 0px var(--sf-dark); cursor: pointer;">Get Started</a>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="logo-link" id="logo-brand">
+        <div class="logo-icon">🤖</div>
+        <span>StrategyFactory<span style="color: var(--sf-blue);">.ai</span></span>
+      </a>
+      
+      <div class="nav-tabs" id="main-nav-tabs">
+        <button class="nav-tab-btn active" data-target="dashboard-view" id="nav-btn-dashboard">Dashboard</button>
+        <button class="nav-tab-btn" data-target="builder-view" id="nav-btn-builder">Strategy Builder</button>
+        <button class="nav-tab-btn" data-target="fleet-view" id="nav-btn-fleet">Bot Fleet</button>
+        <button class="nav-tab-btn" data-target="webhooks-view" id="nav-btn-webhooks">TV Webhooks</button>
+        <button class="nav-tab-btn" data-target="pricing-view" id="nav-btn-pricing">Pricing</button>
+      </div>
+
+      <div class="nav-actions">
+        <div class="nb-badge nb-badge-green" style="display: flex; align-items: center; gap: 0.4rem;">
+          <span class="pulse-indicator"></span>
+          <span>LIVE MARKET</span>
+        </div>
+        <button class="nb-btn nb-btn-sm" id="nav-btn-deploy-shortcut">
+          <i data-lucide="plus-circle" style="width: 1.1rem; height: 1.1rem;"></i>
+          <span>Deploy Bot</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Workspaces Container -->
+  <main class="container" style="margin-top: 2rem;">
+    
+    <!-- 1. DASHBOARD VIEW -->
+    <section id="dashboard-view" class="view-section active">
+      <div class="nb-card no-hover" style="background-color: var(--sf-dark); color: #FFF; margin-bottom: 2rem;">
+        <h1 style="font-size: 2.2rem; font-weight: 900; letter-spacing: -0.02em; line-height: 1.1;">
+          <span style="background-color: var(--sf-orange); color: var(--sf-dark); padding: 0.15rem 0.5rem; border-radius: 4px; display: inline-block; transform: rotate(-1deg); margin-bottom: 0.5rem;">AI TRADING BOTS</span><br>
+          FOR TESTED TRADING AUTOMATION
+        </h1>
+        <p style="margin-top: 1rem; color: rgba(255, 255, 255, 0.8); font-size: 1.1rem; max-width: 700px;">
+          Access custom-built algorithms, backtest strategy scripts, and setup automation without manual chart-watching.
+        </p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="dashboard-grid">
+        <div class="nb-card stat-card" id="card-stat-profit">
+          <div>
+            <div class="stat-header">Total Net Profit</div>
+            <div class="stat-value text-sfgreen" id="stat-total-profit">+$14,284.50</div>
+          </div>
+          <div class="stat-footer trend-up">
+            <i data-lucide="trending-up" style="display: inline-block; vertical-align: sub; width: 0.95rem; height: 0.95rem;"></i> +18.4% this month
+          </div>
+        </div>
+        <div class="nb-card stat-card" id="card-stat-winrate">
+          <div>
+            <div class="stat-header">Average Win Rate</div>
+            <div class="stat-value" id="stat-win-rate">68.2%</div>
+          </div>
+          <div class="stat-footer text-sfmuted">
+            Across active trading systems
+          </div>
+        </div>
+        <div class="nb-card stat-card" id="card-stat-bots">
+          <div>
+            <div class="stat-header">Active Bot Fleet</div>
+            <div class="stat-value" id="stat-active-bots">4 Bots</div>
+          </div>
+          <div class="stat-footer trend-up">
+            All systems running healthy
+          </div>
+        </div>
+        <div class="nb-card stat-card" id="card-stat-trades">
+          <div>
+            <div class="stat-header">Trades Executed (24h)</div>
+            <div class="stat-value" id="stat-trades-24h">42</div>
+          </div>
+          <div class="stat-footer text-sfmuted">
+            Fully automated live fills
+          </div>
+        </div>
+      </div>
+
+      <!-- Lower Panels -->
+      <div class="dashboard-lower-grid">
+        <!-- Main Performance Chart -->
+        <div class="nb-card no-hover" id="card-performance-chart">
+          <div style="display: flex; justify-between; align-items: center; border-bottom: 2px solid var(--sf-dark); padding-bottom: 0.75rem;">
+            <h2 style="font-weight: 900; font-size: 1.25rem; text-transform: uppercase;">Cumulative Performance Curve</h2>
+            <div class="nb-badge nb-badge-orange" style="margin-left: auto;">USD Account</div>
+          </div>
+          <div class="chart-container">
+            <canvas id="dashboardPerformanceChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Live Trade log -->
+        <div class="nb-card no-hover" id="card-live-log">
+          <div style="display: flex; justify-between; align-items: center; border-bottom: 2px solid var(--sf-dark); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+            <h2 style="font-weight: 900; font-size: 1.25rem; text-transform: uppercase; display: flex; align-items: center; gap: 0.4rem;">
+              <span class="pulse-indicator"></span> Live Activity Feed
+            </h2>
+          </div>
+          <div class="log-feed-container" id="live-trade-log-container">
+            <!-- Dynamically populated in app.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. STRATEGY BUILDER VIEW -->
+    <section id="builder-view" class="view-section">
+      <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2rem; font-weight: 900; text-transform: uppercase;">Strategy Factory</h1>
+        <p style="color: var(--sf-muted); font-size: 1rem;">Design your automated script, run a simulation against historical volatility, and deploy directly to the live executor.</p>
+      </div>
+
+      <div class="builder-container">
+        <!-- Form Control Panel -->
+        <div class="nb-card no-hover" id="builder-control-panel">
+          <h2 style="font-weight: 900; font-size: 1.2rem; text-transform: uppercase; margin-bottom: 1.5rem; border-bottom: 2px solid var(--sf-dark); padding-bottom: 0.5rem;">Strategy Inputs</h2>
+          
+          <form id="strategy-builder-form">
+            <div class="form-group">
+              <label class="form-label" for="param-asset">Target Ticker</label>
+              <select class="form-select" id="param-asset">
+                <option value="AAPL">AAPL (Apple Inc.)</option>
+                <option value="NVDA">NVDA (NVIDIA Corp.)</option>
+                <option value="TSLA">TSLA (Tesla Motors)</option>
+                <option value="BTCUSDT">BTC/USDT (Bitcoin)</option>
+                <option value="ETHUSDT">ETH/USDT (Ethereum)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="param-strategy">Strategy Template</label>
+              <select class="form-select" id="param-strategy">
+                <option value="SMA_CROSS">Simple Moving Average Cross</option>
+                <option value="RSI_OS_OB">RSI Overbought/Oversold</option>
+                <option value="MACD_MOM">MACD Trend Momentum</option>
+                <option value="BOLL_BREAK">Bollinger Bands Breakout</option>
+              </select>
+            </div>
+
+            <!-- Parameters fields -->
+            <div id="param-group-sma">
+              <div class="form-group">
+                <label class="form-label" for="param-fast-ma">Fast Period (<span id="val-fast-ma">10</span>)</label>
+                <input type="range" class="form-range" id="param-fast-ma" min="5" max="50" value="10">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="param-slow-ma">Slow Period (<span id="val-slow-ma">30</span>)</label>
+                <input type="range" class="form-range" id="param-slow-ma" min="20" max="200" value="30">
+              </div>
+            </div>
+
+            <div id="param-group-rsi" style="display: none;">
+              <div class="form-group">
+                <label class="form-label" for="param-rsi-len">RSI Length (<span id="val-rsi-len">14</span>)</label>
+                <input type="range" class="form-range" id="param-rsi-len" min="7" max="28" value="14">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="param-rsi-ob">Overbought Level (<span id="val-rsi-ob">70</span>)</label>
+                <input type="range" class="form-range" id="param-rsi-ob" min="65" max="85" value="70">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="param-rsi-os">Oversold Level (<span id="val-rsi-os">30</span>)</label>
+                <input type="range" class="form-range" id="param-rsi-os" min="15" max="35" value="30">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="param-sl">Stop Loss (%) (<span id="val-sl">2.0</span>%)</label>
+              <input type="range" class="form-range" id="param-sl" min="0.5" max="10.0" step="0.1" value="2.0">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="param-tp">Take Profit (%) (<span id="val-tp">5.0</span>%)</label>
+              <input type="range" class="form-range" id="param-tp" min="1.0" max="25.0" step="0.5" value="5.0">
+            </div>
+
+            <button type="submit" class="nb-btn nb-btn-green" style="width: 100%; margin-top: 1rem;" id="btn-run-backtest">
+              <i data-lucide="play" style="width: 1.1rem; height: 1.1rem;"></i> Run Simulation
+            </button>
+          </form>
+        </div>
+
+        <!-- Backtest Results Display -->
+        <div class="nb-card no-hover" id="builder-results-panel">
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--sf-dark); padding-bottom: 0.75rem; margin-bottom: 1.5rem;">
+            <h2 style="font-weight: 900; font-size: 1.2rem; text-transform: uppercase;">Simulation Dashboard</h2>
+            <button class="nb-btn nb-btn-outline nb-btn-sm" id="btn-deploy-strategy" disabled>
+              <i data-lucide="plus" style="width: 0.95rem; height: 0.95rem;"></i> Deploy Bot
+            </button>
+          </div>
+
+          <!-- Loading state overlay -->
+          <div id="backtest-loading-state" style="display: none; height: 350px; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;">
+            <div style="width: 3.5rem; height: 3.5rem; border: 4px solid var(--sf-dark); border-top-color: var(--sf-orange); border-radius: 50%; animation: spin 1s infinite linear;"></div>
+            <p style="font-weight: 800; text-transform: uppercase; font-size: 0.9rem;">Backtesting in progress...</p>
+          </div>
+
+          <!-- Empty state -->
+          <div id="backtest-empty-state" style="height: 350px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; color: var(--sf-muted); text-align: center;">
+            <i data-lucide="activity" style="width: 3rem; height: 3rem; opacity: 0.4;"></i>
+            <p style="font-weight: 600;">Adjust parameters and hit "Run Simulation" to analyze strategy results.</p>
+          </div>
+
+          <!-- Actual Results Content -->
+          <div id="backtest-results-content" style="display: none;">
+            <div class="metric-grid">
+              <div class="metric-item">
+                <div class="metric-label">Total Return</div>
+                <div class="metric-value text-sfgreen" id="res-total-return">+28.4%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Max Drawdown</div>
+                <div class="metric-value trend-down" id="res-max-dd">-6.4%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Win Rate</div>
+                <div class="metric-value" id="res-winrate">61.5%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Profit Factor</div>
+                <div class="metric-value" id="res-profit-factor">1.84</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Sharpe Ratio</div>
+                <div class="metric-value" id="res-sharpe">2.12</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">Total Trades</div>
+                <div class="metric-value" id="res-total-trades">56</div>
+              </div>
+            </div>
+
+            <!-- Strategy Equity Curve Chart -->
+            <div style="border: 2px solid var(--sf-dark); border-radius: 12px; padding: 1rem; background-color: #FFFFFF; margin-bottom: 1.5rem;">
+              <h3 style="font-size: 0.9rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem; color: var(--sf-muted);">Backtest Equity curve</h3>
+              <div style="position: relative; width: 100%; height: 220px;">
+                <canvas id="backtestEquityChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Historical Trade Log -->
+            <div>
+              <h3 style="font-size: 0.9rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.5rem; color: var(--sf-muted);">Simulation Trade History</h3>
+              <div style="max-height: 180px; overflow-y: auto; border: 2px solid var(--sf-dark); border-radius: 8px;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: var(--font-mono); font-size: 0.8rem;" id="backtest-trades-table">
+                  <thead>
+                    <tr style="background-color: var(--sf-dark); color: #FFF; font-weight: bold; border-bottom: 2px solid var(--sf-dark);">
+                      <th style="padding: 0.5rem;">Trade #</th>
+                      <th style="padding: 0.5rem;">Type</th>
+                      <th style="padding: 0.5rem;">Entry Price</th>
+                      <th style="padding: 0.5rem;">Exit Price</th>
+                      <th style="padding: 0.5rem;">Return %</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Populated in JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. BOT FLEET VIEW -->
+    <section id="fleet-view" class="view-section">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem;">
+        <div>
+          <h1 style="font-size: 2rem; font-weight: 900; text-transform: uppercase;">Bot Fleet Commander</h1>
+          <p style="color: var(--sf-muted); font-size: 1rem;">Monitor your active web-execution systems. Each bot trades in real-time based on calculated logic rules.</p>
+        </div>
+        <button class="nb-btn nb-btn-orange" id="btn-create-bot-modal">
+          <i data-lucide="plus" style="width: 1.1rem; height: 1.1rem;"></i> Deploy New Bot
+        </button>
+      </div>
+
+      <!-- Active Fleet Grid -->
+      <div class="fleet-grid" id="bot-fleet-grid-container">
+        <!-- Dynamically rendered via JS -->
+      </div>
+    </section>
+
+    <!-- 4. WEBHOOKS INTEGRATION VIEW -->
+    <section id="webhooks-view" class="view-section">
+      <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2rem; font-weight: 900; text-transform: uppercase;">TradingView Webhook Integration</h1>
+        <p style="color: var(--sf-muted); font-size: 1rem;">Automate StrategyFactory using alerts directly from TradingView charts. We listen and execute instantly on your exchange.</p>
+      </div>
+
+      <div class="webhook-split">
+        <!-- Connect API Setup -->
+        <div class="nb-card no-hover" id="card-api-setup">
+          <h2 style="font-weight: 900; font-size: 1.25rem; text-transform: uppercase; margin-bottom: 1.5rem; border-bottom: 2px solid var(--sf-dark); padding-bottom: 0.5rem;">1. Connect Exchange Credentials</h2>
+          
+          <form id="api-credentials-form">
+            <div class="form-group">
+              <label class="form-label" for="webhook-exchange">Exchange Provider</label>
+              <select class="form-select" id="webhook-exchange">
+                <option value="binance">Binance Futures</option>
+                <option value="bybit">Bybit Derivatives</option>
+                <option value="okx">OKX Trade</option>
+                <option value="coinbase">Coinbase Advanced</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="webhook-api-key">API Key</label>
+              <input type="password" class="form-input" id="webhook-api-key" placeholder="Paste your API key here...">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label" for="webhook-api-secret">API Secret</label>
+              <input type="password" class="form-input" id="webhook-api-secret" placeholder="Paste your API secret here...">
+            </div>
+
+            <button type="submit" class="nb-btn nb-btn-dark" style="width: 100%;">
+              <i data-lucide="link" style="width: 1.1rem; height: 1.1rem;"></i> Link Exchange API
+            </button>
+          </form>
+
+          <div id="exchange-link-success" class="nb-badge nb-badge-green" style="display: none; width: 100%; margin-top: 1rem; text-align: center; font-size: 0.85rem; padding: 0.6rem;">
+            ✓ Exchange connected successfully! API endpoint linked.
+          </div>
+        </div>
+
+        <!-- Alert Webhook Payload Generator -->
+        <div class="nb-card no-hover" id="card-webhook-details">
+          <h2 style="font-weight: 900; font-size: 1.25rem; text-transform: uppercase; margin-bottom: 1.5rem; border-bottom: 2px solid var(--sf-dark); padding-bottom: 0.5rem;">2. Webhook Setup details</h2>
+          
+          <div class="form-group">
+            <label class="form-label">Listener Webhook Endpoint</label>
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="text" class="form-input" id="webhook-url-display" readonly value="https://api.strategyfactory.ai/v1/webhook/sf-683a-k28" style="font-family: var(--font-mono); font-size: 0.85rem; background-color: var(--sf-light-gray);">
+              <button class="nb-btn" id="btn-copy-webhook-url" style="padding: 0.5rem 1rem;">Copy</button>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 1.5rem;">
+            <label class="form-label">Alert JSON Payloads</label>
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+              <button class="nb-btn nb-btn-sm nb-btn-outline active" id="payload-tab-buy">BUY ALERT</button>
+              <button class="nb-btn nb-btn-sm nb-btn-outline" id="payload-tab-sell">SELL ALERT</button>
+              <button class="nb-btn nb-btn-sm nb-btn-outline" id="payload-tab-exit">EXIT ALERT</button>
+            </div>
+            
+            <div class="code-block-wrap">
+              <button class="copy-btn" id="btn-copy-payload">Copy JSON</button>
+              <pre><code id="payload-code-display">{
+  "action": "buy",
+  "symbol": "BTCUSDT",
+  "volume": 0.05,
+  "leverage": 10,
+  "secret": "sf-683a-k28"
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. PRICING VIEW -->
+    <section id="pricing-view" class="view-section">
+      <div class="pricing-section">
+        <h1 class="pricing-title">START YOUR AI <span style="background-color: var(--sf-orange); padding: 0 0.5rem; display: inline-block; transform: rotate(-1.5deg);">TRADING BOTS</span> TODAY.</h1>
+        <p class="pricing-subtitle">Step up as your bot fleet grows. Cancel anytime.</p>
+        
+        <div class="pricing-toggle">
+          <button class="active" id="btn-pricing-monthly">Monthly</button>
+          <button id="btn-pricing-annual">Annual (Save 20%)</button>
+        </div>
+
+        <div class="pricing-grid">
+          <!-- Card 1: Apprentice -->
+          <div class="price-card" id="pricing-card-apprentice">
+            <h3 style="font-size: 1.3rem; font-weight: 900; text-transform: uppercase;">Apprentice</h3>
+            <p style="color: var(--sf-muted); font-size: 0.85rem; margin-top: 0.25rem;">For solo traders building a first copybot stack.</p>
+            <div class="price-tag">$<span id="price-val-apprentice" style="font-size: 3rem; font-weight: 900; color: var(--sf-dark);">49</span><span>/month</span></div>
+            <ul class="features-list">
+              <li><i class="check-icon" data-lucide="check-square"></i> Futures Trading Enabled</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> Trader Workbook + AI Prompts</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> 2 Active API Connectors</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> 2 Active Copy Bots</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> 1 Active TV Bot</li>
+              <li class="disabled"><i class="cross-icon" data-lucide="x-square"></i> AI Strategy Copilot</li>
+              <li class="disabled"><i class="cross-icon" data-lucide="x-square"></i> Developers API</li>
+              <li class="disabled"><i class="cross-icon" data-lucide="x-square"></i> TradingView Full Library</li>
+            </ul>
+            <button class="nb-btn nb-btn-dark" style="margin-top: auto; width: 100%;">Get Apprentice</button>
+          </div>
+
+          <!-- Card 2: VIP -->
+          <div class="price-card popular" id="pricing-card-vip">
+            <div class="popular-badge">Most Popular</div>
+            <h3 style="font-size: 1.3rem; font-weight: 900; text-transform: uppercase;">VIP</h3>
+            <p style="color: var(--sf-muted); font-size: 0.85rem; margin-top: 0.25rem;">Unlimited fleet + TradingView strategy library.</p>
+            <div class="price-tag">$<span id="price-val-vip" style="font-size: 3rem; font-weight: 900; color: var(--sf-dark);">99</span><span>/month</span></div>
+            <ul class="features-list">
+              <li><i class="check-icon" data-lucide="check-square"></i> Futures Trading Enabled</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> Trader Workbook + AI Prompts</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> Unlimited API Connectors</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> Unlimited Copy Bots</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> Unlimited TV Bots</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> AI Strategy Copilot</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> Developers API Access</li>
+              <li class="disabled"><i class="cross-icon" data-lucide="x-square"></i> 1:1 Onboarding Coach</li>
+            </ul>
+            <button class="nb-btn" style="margin-top: auto; width: 100%;">Go VIP</button>
+          </div>
+
+          <!-- Card 3: Quant Desk -->
+          <div class="price-card" id="pricing-card-quant">
+            <h3 style="font-size: 1.3rem; font-weight: 900; text-transform: uppercase;">Quant Desk</h3>
+            <p style="color: var(--sf-muted); font-size: 0.85rem; margin-top: 0.25rem;">White-glove onboarding & proprietary scripts.</p>
+            <div class="price-tag">$<span id="price-val-quant" style="font-size: 3rem; font-weight: 900; color: var(--sf-dark);">299</span><span>/month</span></div>
+            <ul class="features-list">
+              <li><i class="check-icon" data-lucide="check-square"></i> Everything in VIP Included</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> 1:1 Onboarding Call</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> TradingView Full Library access</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> Prop Firm AI Prompts Pack</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> Dedicated Support Slack</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> Custom strategy review Qs</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> Developers API Access</li>
+              <li><i class="check-icon" data-lucide="check-square"></i> Unlimited execution systems</li>
+            </ul>
+            <button class="nb-btn nb-btn-dark" style="margin-top: auto; width: 100%;">Get Quant Desk</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modals -->
+  <!-- Deploy Bot Modal -->
+  <div class="modal-backdrop" id="deploy-bot-modal">
+    <div class="nb-card modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--sf-dark); padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
+        <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.15rem;">Deploy Trading Bot</h3>
+        <button class="nb-btn nb-btn-outline nb-btn-sm" id="btn-close-deploy-modal" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Close</button>
+      </div>
+
+      <form id="modal-deploy-bot-form">
+        <div class="form-group">
+          <label class="form-label" for="modal-bot-name">Bot Name</label>
+          <input type="text" class="form-input" id="modal-bot-name" required placeholder="e.g. BTC Trend Alpha">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="modal-bot-asset">Asset Ticker</label>
+          <select class="form-select" id="modal-bot-asset">
+            <option value="AAPL">AAPL (Apple)</option>
+            <option value="NVDA">NVDA (NVIDIA)</option>
+            <option value="TSLA">TSLA (Tesla)</option>
+            <option value="BTCUSDT">BTC/USDT (Bitcoin)</option>
+            <option value="ETHUSDT">ETH/USDT (Ethereum)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="modal-bot-strategy">Strategy Rules</label>
+          <select class="form-select" id="modal-bot-strategy">
+            <option value="SMA_CROSS">Simple Moving Average Cross</option>
+            <option value="RSI_OS_OB">RSI Overbought/Oversold</option>
+            <option value="MACD_MOM">MACD Trend Momentum</option>
+            <option value="BOLL_BREAK">Bollinger Bands Breakout</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="modal-bot-allocation">Capital Allocation ($)</label>
+          <input type="number" class="form-input" id="modal-bot-allocation" required value="1000" min="100" max="100000">
+        </div>
+
+        <button type="submit" class="nb-btn nb-btn-orange" style="width: 100%; margin-top: 1rem;">
+          <i data-lucide="play" style="width: 1.1rem; height: 1.1rem; fill: currentColor;"></i> Launch Executor
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container footer-content">
+      <div>
+        <div class="footer-logo">🤖 StrategyFactory<span style="color: var(--sf-blue);">.ai</span></div>
+        <p style="font-size: 0.8rem; color: var(--sf-muted); margin-top: 0.5rem; max-width: 500px;">
+          Disclaimer: Simulated trading results carry inherent risk. Backtested metrics do not guarantee future live performance. Always practice strict capital allocation safety.
+        </p>
+      </div>
+      <div class="footer-links">
+        <a href="#dashboard-view" class="footer-tab-trigger" data-target="dashboard-view">Dashboard</a>
+        <a href="#builder-view" class="footer-tab-trigger" data-target="builder-view">Backtest</a>
+        <a href="#fleet-view" class="footer-tab-trigger" data-target="fleet-view">Bots</a>
+        <a href="#pricing-view" class="footer-tab-trigger" data-target="pricing-view">Pricing</a>
+      </div>
+    </div>
+    <div class="container" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(11, 18, 32, 0.1); text-align: center; font-size: 0.8rem; color: var(--sf-muted);">
+      © 2026 StrategyFactory.ai. Developed in styling alignment with DaviddTech. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="./app.js" type="module"></script>
+</body>
+</html>

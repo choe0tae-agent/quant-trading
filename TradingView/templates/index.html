@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingView Plus - Multi-Timeframe Charts</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=1.0.2">
+    <!-- TradingView Lightweight Charts CDN -->
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="brand">
+            <h1>TradingView <span class="accent">Plus</span></h1>
+            <p class="subtitle">멀티 타임프레임 차트 대시보드</p>
+        </div>
+        <div class="global-controls">
+            <div class="control-group">
+                <label for="grid-size-select">차트 개수</label>
+                <select id="grid-size-select" class="custom-select">
+                    <option value="1">1 (전체 화면)</option>
+                    <option value="2">2 (좌우 분할)</option>
+                    <option value="4">4 (2×2 분할)</option>
+                    <option value="6">6 (3×2 분할)</option>
+                    <option value="8">8 (4×2 분할)</option>
+                </select>
+            </div>
+            <button id="toggle-chat-btn" class="header-action-btn">
+                <svg class="chat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>AI 차트 비서</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="dashboard-area">
+        <div id="charts-grid" class="charts-grid grid-4">
+            <!-- Panes will be dynamically injected here by app.js -->
+        </div>
+
+        <!-- Collapsible Chatbot Sidebar -->
+        <aside id="chatbot-sidebar" class="chatbot-sidebar collapsed">
+            <div id="sidebar-resizer" class="sidebar-resizer"></div>
+            <!-- Chat View -->
+            <div id="chat-view" class="sidebar-pane">
+                <div class="sidebar-header">
+                    <div class="header-title-container">
+                        <h3>AI 차트 분석 비서</h3>
+                        <span id="active-chart-label" class="active-chart-badge">선택된 차트: 로딩 중...</span>
+                    </div>
+                    <div class="header-actions">
+                        <button id="chat-settings-btn" class="icon-btn" title="AI 설정">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                        </button>
+                        <button id="close-chat-btn" class="icon-btn" title="닫기">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Message History container -->
+                <div id="chat-messages" class="chat-messages">
+                    <div class="ai-msg message">
+                        <div class="msg-bubble">
+                            안녕하세요! 분석하고자 하는 차트를 클릭하여 선택한 후 **📊 현재 차트 진단** 버튼을 누르거나 아래에 질문을 작성해 주세요.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick diagnosis and input actions -->
+                <div class="chat-input-area">
+                    <div class="input-options">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="attach-screenshot-cb" checked>
+                            <span class="checkmark"></span>
+                            차트 스크린샷 포함
+                        </label>
+                        <button id="quick-diagnose-btn" class="quick-btn" title="활성 차트를 즉시 기술적으로 진단합니다.">
+                            📊 현재 차트 진단
+                        </button>
+                    </div>
+                    <div class="textarea-container">
+                        <textarea id="chat-input" placeholder="차트 흐름에 대해 질문하거나 지시하세요... (Enter로 전송, Shift+Enter 줄바꿈)"></textarea>
+                        <button id="send-chat-btn" class="send-btn" title="전송">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings View (Toggled via settings button) -->
+            <div id="settings-view" class="sidebar-pane hidden">
+                <div class="sidebar-header">
+                    <h3>AI 비서 설정</h3>
+                    <button id="settings-close-btn" class="icon-btn" title="뒤로가기">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                    </button>
+                </div>
+                <div class="settings-content">
+                    <div class="settings-group">
+                        <label for="provider-select">AI 제공자</label>
+                        <select id="provider-select" class="custom-select w-100">
+                            <option value="gemini">Google Gemini</option>
+                            <option value="openai">OpenAI</option>
+                            <option value="claude">Anthropic Claude</option>
+                            <option value="ollama">Local Ollama</option>
+                            <option value="openrouter">OpenRouter</option>
+                        </select>
+                    </div>
+                    
+                    <div class="settings-group" id="api-key-group">
+                        <label for="api-key-input">API Key</label>
+                        <div class="password-input-container">
+                            <input type="password" id="api-key-input" class="custom-input" placeholder="API Key 입력 (비워두면 .env 로드)">
+                            <button id="toggle-key-visibility-btn" class="visibility-btn">보기</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-group hidden" id="ollama-url-group">
+                        <label for="ollama-url-input">Ollama URL</label>
+                        <input type="text" id="ollama-url-input" class="custom-input" placeholder="http://localhost:11434">
+                    </div>
+                    
+                    <div class="settings-group">
+                        <label for="model-select">AI 모델</label>
+                        <select id="model-select" class="custom-select w-100"></select>
+                        <input type="text" id="custom-model-input" class="custom-input hidden mt-2" placeholder="모델명 직접 입력 (예: llama3.1)">
+                    </div>
+
+                    <div class="settings-group">
+                        <label for="system-prompt-input">시스템 명령 (AI 가이드라인)</label>
+                        <textarea id="system-prompt-input" class="custom-textarea" rows="4"></textarea>
+                    </div>
+                    
+                    <button id="save-settings-btn" class="primary-btn w-100">설정 저장 및 뒤로가기</button>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Pane Template (for JS rendering) -->
+    <template id="pane-template">
+        {% raw %}
+        <div class="chart-pane" id="pane-{{id}}">
+            <div class="pane-header">
+                <div class="pane-controls">
+                    <select class="source-select pane-control-select" data-pane-id="{{id}}"></select>
+                    <select class="symbol-select pane-control-select" data-pane-id="{{id}}"></select>
+                    <select class="timeframe-select pane-control-select" data-pane-id="{{id}}"></select>
+                    <button class="indicator-toggle-btn" data-indicator="sma" data-pane-id="{{id}}">단순평균</button>
+                    <button class="indicator-toggle-btn" data-indicator="ema" data-pane-id="{{id}}">지수평균</button>
+                </div>
+                <div class="pane-ticker-bar" id="ticker-bar-{{id}}">
+                    <div class="ticker-indicator"></div>
+                    <div class="ticker-content">
+                        <span class="ticker-symbol" id="ticker-symbol-{{id}}">-</span>
+                        <span class="ticker-price" id="ticker-price-{{id}}">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-container" id="chart-container-{{id}}">
+                <!-- Lightweight chart will render here -->
+            </div>
+        </div>
+        {% endraw %}
+    </template>
+
+    <!-- Main JavaScript File -->
+    <script src="{{ url_for('static', filename='app.js') }}?v=1.0.2"></script>
+</body>
+</html>
